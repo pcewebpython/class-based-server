@@ -54,8 +54,19 @@ class HttpServer():
 
         Then you would return "/images/sample_1.png"
         """
-
-        return "TODO: COMPLETE THIS"  # TODO
+        try:
+            if "favicon.ico" in request:
+                return "/webroot/favicon.ico"
+            if "make_time.py" in request:
+                return "/webroot/make_time.py"
+            if "sample.txt" in request:
+                return "/webroot/sample.txt"
+            if "a_web_page.html" in request:
+                return "/webroot/a_web_page.html"
+            #if b"favicon.ico" in request:
+                #return "/webroot/a_web_page.html"
+        except:
+            return "/"
 
 
     @staticmethod
@@ -63,7 +74,7 @@ class HttpServer():
         """
         This method should return a suitable mimetype for the given `path`.
 
-        A mimetype is a short bytestring that tells a browser how to
+        A mimetype is a short byte string that tells a browser how to
         interpret the response body. For example, if the response body
         contains a web page then the mimetype should be b"text/html". If
         the response body contains a JPG image, then the mimetype would
@@ -84,11 +95,22 @@ class HttpServer():
             # This function should return an appropriate mimetype event
             # for files that don't exist.
         """
-
-        if path.endswith('/'):
+        try:
+            if path.endswith('/'):
+                return b"text/plain"
+            if path.endswith('.html'):
+                return b"text/html"
+            if path.endswith('.png'):
+                return b"image/png"
+            if path.endswith('.jpg'):
+                return b"image/jpg"
+            if path.endswith('.ico'):
+                return b"image/ico"
+            if path.endswith('.txt'):
+                return b"text/plain"
+        except FileNotFoundError:
             return b"text/plain"
-        else:
-            return b"TODO: FINISH THE REST OF THESE CASES"  # TODO
+
 
     @staticmethod
     def get_content(path):
@@ -123,8 +145,20 @@ class HttpServer():
             # The file `webroot/a_page_that_doesnt_exist.html`) doesn't exist,
             # so this should raise a FileNotFoundError.
         """
+        try:
+            if os.path.isdir(path):
+                entries = os.listdir(path)
+                return entries
 
-        return b"Not implemented!"  # TODO: Complete this function.
+            if os.path.isfile(path):
+                with open(path, 'r') as f:
+                    data = f.read()
+                return data
+
+        except FileNotFoundError:
+            return f"The file {path} does not exist"
+
+
 
     def __init__(self, port):
         self.port = port
