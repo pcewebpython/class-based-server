@@ -108,14 +108,19 @@ class HttpServer():
                 return b"text/html"
             if path.endswith('.png'):
                 return b"image/png"
+
             if path.endswith('.jpg'):
+                if 'JPEG' in path:
+                    return b"image/jpeg"
                 return b"image/jpg"
             if path.endswith('.ico'):
                 return b"image/ico"
             if path.endswith('.txt'):
                 return b"text/plain"
+            if path.endswith('.py'):
+                return b"text/plain"
         except FileNotFoundError:
-            return b"text/plain"
+            return ""
 
 
     @staticmethod
@@ -178,10 +183,22 @@ class HttpServer():
                         for line in Lines:
                             new_html += line.strip('\n') + '\r\n'
                     return bytes(new_html, 'utf-8')
+
+                if '.png' or '.jpg' in path:
+                    with open(file_path, "rb") as image:
+                        f = image.read()
+                        #b = bytes(b, 'utf-8')
+                    return f
+                if 'jpeg' in path:
+                    #with open(file_path, "rb") as image:
+                        #f = image.read()
+                        #b = bytes(b, 'utf-8')
+                    raise FileNotFoundError
+
                 else:
                     with open(file_path, 'r') as f:
                         data = f.read()
-                    return data # bytes(data, 'utf-8')w
+                    return bytes(data, 'utf-8')
 
             #os.path.isfile(path)
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)

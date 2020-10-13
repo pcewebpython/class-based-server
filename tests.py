@@ -99,6 +99,7 @@ class WebTestCase(unittest.TestCase):
         response = self.get_response(web_path)
 
         self.assertEqual(response.getcode(), 200, error_comment)
+
         self.assertEqual(response.getheader('Content-Type'), 'image/jpeg', error_comment)
 
     def test_get_sample_1_png(self):
@@ -154,9 +155,11 @@ class WebTestCase(unittest.TestCase):
         local_path = os.path.join('webroot', directory)
         web_path = '/' + directory
         error_comment = "Error encountered while visiting " + web_path
-
+        print(web_path)
         response = self.get_response(web_path)
+
         body = response.read().decode()
+        print(os.getcwd())
 
         for path in os.listdir(local_path):
             self.assertIn(path, body, error_comment)
@@ -191,4 +194,5 @@ class WebTestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    #test_get_sample_scene_balls_jpeg_mime_type()
     unittest.main()
