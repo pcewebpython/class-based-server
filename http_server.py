@@ -3,6 +3,8 @@ import sys
 import traceback
 import os
 import mimetypes
+import errno
+
 
 class HttpServer():
 
@@ -55,18 +57,22 @@ class HttpServer():
         Then you would return "/images/sample_1.png"
         """
         try:
-            if "favicon.ico" in request:
+            if b"favicon.ico" in request:
                 return "/webroot/favicon.ico"
-            if "make_time.py" in request:
+            if b"make_time.py" in request:
                 return "/webroot/make_time.py"
-            if "sample.txt" in request:
+            if b"sample.txt" in request:
                 return "/webroot/sample.txt"
-            if "a_web_page.html" in request:
+            if b"a_web_page.html" in request:
                 return "/webroot/a_web_page.html"
+           # else:
+               #return "/webroot/"
             #if b"favicon.ico" in request:
                 #return "/webroot/a_web_page.html"
         except:
-            return "/"
+            header_parts = request.split(" ")
+            sub_string = header_parts[1]
+            return sub_string
 
 
     @staticmethod
@@ -146,17 +152,42 @@ class HttpServer():
             # so this should raise a FileNotFoundError.
         """
         try:
-            if os.path.isdir(path):
-                entries = os.listdir(path)
-                return entries
+            #check_path = HttpServer.get_path(path)
+            cur_dir = sys.path[0] + "\\webroot\\"
+            #os.chdir(cur_dir)
+            webroot_dir = os.getcwd()
+            return_list = ''
+            if path == "/":
+                    #os.path.isdir(check_path):
+                entries = os.listdir(cur_dir)
+                for item in entries:
+                    return_list += item + '\n'
+                return bytes(return_list, 'utf-8')
 
-            if os.path.isfile(path):
-                with open(path, 'r') as f:
-                    data = f.read()
-                return data
+            #if path == "/images/":
+                    #os.path.isdir(check_path):
+                #entries = os.listdir(cur_dir)
+                #return entries
 
+            if os.path.isfile(cur_dir + path):
+                file_path = os.path.join(cur_dir, path.strip('/'))
+                if '.html' in path:
+                    with open(file_path, 'r') as fp:
+                        Lines = fp.readlines()
+                        new_html = ""
+                        for line in Lines:
+                            new_html += line.strip('\n') + '\r\n'
+                    return bytes(new_html, 'utf-8')
+                else:
+                    with open(file_path, 'r') as f:
+                        data = f.read()
+                    return data # bytes(data, 'utf-8')w
+
+            #os.path.isfile(path)
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
         except FileNotFoundError:
-            return f"The file {path} does not exist"
+            raise FileNotFoundError
+            #return True
 
 
 

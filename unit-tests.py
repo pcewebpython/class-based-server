@@ -70,4 +70,7 @@ class TestCase(unittest.TestCase):
 
 
 if __name__ == '__main__':
+    #test_get_content_file()
+    #test_get_content_not_found()
+    test_get_path()
     unittest.main()
