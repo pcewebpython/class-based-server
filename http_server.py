@@ -175,30 +175,9 @@ class HttpServer():
                 #return entries
 
             if os.path.isfile(cur_dir + path):
-                file_path = os.path.join(cur_dir, path.strip('/'))
-                if '.html' in path:
-                    with open(file_path, 'r') as fp:
-                        Lines = fp.readlines()
-                        new_html = ""
-                        for line in Lines:
-                            new_html += line.strip('\n') + '\r\n'
-                    return bytes(new_html, 'utf-8')
-
-                if '.png' or '.jpg' in path:
-                    with open(file_path, "rb") as image:
-                        f = image.read()
-                        #b = bytes(b, 'utf-8')
-                    return f
-                if 'jpeg' in path:
-                    #with open(file_path, "rb") as image:
-                        #f = image.read()
-                        #b = bytes(b, 'utf-8')
-                    raise FileNotFoundError
-
-                else:
-                    with open(file_path, 'r') as f:
-                        data = f.read()
-                    return bytes(data, 'utf-8')
+                with open(file_path, 'rb') as f:
+                    data = f.read()
+                return data
 
             #os.path.isfile(path)
             raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
