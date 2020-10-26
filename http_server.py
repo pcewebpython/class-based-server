@@ -3,6 +3,8 @@ import sys
 import traceback
 import os
 import mimetypes
+import errno
+
 
 class HttpServer():
 
@@ -54,8 +56,23 @@ class HttpServer():
 
         Then you would return "/images/sample_1.png"
         """
-
-        return "TODO: COMPLETE THIS"  # TODO
+        try:
+            if b"favicon.ico" in request:
+                return "/webroot/favicon.ico"
+            if b"make_time.py" in request:
+                return "/webroot/make_time.py"
+            if b"sample.txt" in request:
+                return "/webroot/sample.txt"
+            if b"a_web_page.html" in request:
+                return "/webroot/a_web_page.html"
+           # else:
+               #return "/webroot/"
+            #if b"favicon.ico" in request:
+                #return "/webroot/a_web_page.html"
+        except:
+            header_parts = request.split(" ")
+            sub_string = header_parts[1]
+            return sub_string
 
 
     @staticmethod
@@ -63,7 +80,7 @@ class HttpServer():
         """
         This method should return a suitable mimetype for the given `path`.
 
-        A mimetype is a short bytestring that tells a browser how to
+        A mimetype is a short byte string that tells a browser how to
         interpret the response body. For example, if the response body
         contains a web page then the mimetype should be b"text/html". If
         the response body contains a JPG image, then the mimetype would
@@ -84,11 +101,27 @@ class HttpServer():
             # This function should return an appropriate mimetype event
             # for files that don't exist.
         """
+        try:
+            if path.endswith('/'):
+                return b"text/plain"
+            if path.endswith('.html'):
+                return b"text/html"
+            if path.endswith('.png'):
+                return b"image/png"
 
-        if path.endswith('/'):
-            return b"text/plain"
-        else:
-            return b"TODO: FINISH THE REST OF THESE CASES"  # TODO
+            if path.endswith('.jpg'):
+                if 'JPEG' in path:
+                    return b"image/jpeg"
+                return b"image/jpg"
+            if path.endswith('.ico'):
+                return b"image/ico"
+            if path.endswith('.txt'):
+                return b"text/plain"
+            if path.endswith('.py'):
+                return b"text/plain"
+        except FileNotFoundError:
+            return ""
+
 
     @staticmethod
     def get_content(path):
@@ -123,8 +156,36 @@ class HttpServer():
             # The file `webroot/a_page_that_doesnt_exist.html`) doesn't exist,
             # so this should raise a FileNotFoundError.
         """
+        try:
+            #check_path = HttpServer.get_path(path)
+            cur_dir = sys.path[0] + "\\webroot\\"
+            #os.chdir(cur_dir)
+            webroot_dir = os.getcwd()
+            return_list = ''
+            if path == "/":
+                    #os.path.isdir(check_path):
+                entries = os.listdir(cur_dir)
+                for item in entries:
+                    return_list += item + '\n'
+                return bytes(return_list, 'utf-8')
 
-        return b"Not implemented!"  # TODO: Complete this function.
+            #if path == "/images/":
+                    #os.path.isdir(check_path):
+                #entries = os.listdir(cur_dir)
+                #return entries
+
+            if os.path.isfile(cur_dir + path):
+                with open(file_path, 'rb') as f:
+                    data = f.read()
+                return data
+
+            #os.path.isfile(path)
+            raise FileNotFoundError(errno.ENOENT, os.strerror(errno.ENOENT), path)
+        except FileNotFoundError:
+            raise FileNotFoundError
+            #return True
+
+
 
     def __init__(self, port):
         self.port = port
